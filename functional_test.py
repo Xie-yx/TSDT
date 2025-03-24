@@ -1,9 +1,15 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 import unittest
+import tempfile
 
 class NewVisitorTest(unittest.TestCase):
     def setUp(self):
-        self.browser = webdriver.Chrome()
+        chrome_options = Options()
+        # chrome_options.add_argument("--no-sandbox")          # 禁用沙箱
+        # chrome_options.add_argument("--disable-dev-shm-usage")  # 避免共享内存问题
+        chrome_options.add_argument("--headless=new")        # 无头模式（可选）
+        self.browser = webdriver.Chrome(options=chrome_options)
 
     def tearDown(self):
         self.browser.quit()
@@ -11,8 +17,8 @@ class NewVisitorTest(unittest.TestCase):
     def test_can_start_a_list_and_retrieve_it_later(self):
         self.browser.get('http://localhost:8000')
 
-        self.assertIn('To-Do', self.browser.title, f"Browser title was {self.browser.title}")
-        self.fali("Finish the test!")
+        self.assertIn('To-Do', self.browser.title),"Browser title was " + self.browser.title
+        self.fail("Finish the test!")
 
 
 
