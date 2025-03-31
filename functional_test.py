@@ -2,7 +2,9 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import unittest
 import tempfile
+import time
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 
 class NewVisitorTest(unittest.TestCase):
     def setUp(self):
@@ -40,7 +42,7 @@ class NewVisitorTest(unittest.TestCase):
         inputbox.send_keys(Keys.ENTER)
         time.sleep(1)
 
-        table = self.brower.find_element(By.ID, 'id_list_table')
+        table = self.browser.find_element(By.ID, 'id_list_table')
         rows = table.find_elements(By.TAG_NAME,'tr')
         self.assertIn('1: Buy flowers', [row.text for row in rows])
 
