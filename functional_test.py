@@ -22,7 +22,7 @@ class NewVisitorTest(unittest.TestCase):
 
         # 他注意到网页标题和头部包含"To-Do"
         self.assertIn('To-Do', self.browser.title),"Browser title was " + self.browser.title
-        header_text = self.browser.find_element(By.TAG_NAME,'h1').header_text
+        header_text = self.browser.find_element(By.TAG_NAME,'h1').text
         self.assertIn('To-Do', header_text)
 
         # 应用有一个输入代办事项的文本输入框
