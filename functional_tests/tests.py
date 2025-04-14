@@ -5,8 +5,11 @@ import tempfile
 import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from django.test import LiveServerTestCase
 
-class NewVisitorTest(unittest.TestCase):
+MAX_WAIT = 10
+
+class NewVisitorTest(LiveServerTestCase):
     def setUp(self):
         chrome_options = Options()
         # chrome_options.add_argument("--no-sandbox")          # 禁用沙箱
@@ -17,15 +20,23 @@ class NewVisitorTest(unittest.TestCase):
     def tearDown(self):
         self.browser.quit()
 
-    def check_for_row_in_list_table(self, row_text):
-        table = self.browser.find_element(By.ID,'id_list_table')
-        rows = table.find_elements(By.TAG_NAME,'tr')
-        self.assertIn(row_text, [row.text for row in rows])
+    def wait_for_row_in_list_table(self, row_text):
+        start_time = time.time()
+        while True:
+            try:
+                table = self.browser.find_element(By.ID,'id_list_table')
+                rows = table.find_elements(By.TAG_NAME,'tr')
+                self.assertIn(row_text, [row.text for row in rows])
+                return
+            except (AssertionError, WebDriverException) as e:
+                if time.time() - start_time > MAX_WAIT:
+                    raise e
+                time.sleep(0.5)
 
     def test_can_start_a_list_and_retrieve_it_later(self):
         # 张三听说有一个在线待办事项应用
         # 他打开了应用首页
-        self.browser.get('http://localhost:8000')
+        self.browser.get(self.live_server_url)
 
         # 他注意到网页标题和头部包含"To-Do"
         self.assertIn('To-Do', self.browser.title),"Browser title was " + self.browser.title
@@ -56,15 +67,15 @@ class NewVisitorTest(unittest.TestCase):
         inpuxbox = self.browser.find_element(By.ID,'id_new_item')
         inpuxbox.send_keys('Give a gift to Lisi')
         inpuxbox.send_keys(Keys.ENTER)
-        time.sleep(1)
+        # time.sleep(1)
 
         # 页面再次更新，清单中显示了这两个代办
         # table = self.browser.find_element(By.ID, 'id_list_table')
         # rows = table.find_elements(By.TAG_NAME, 'tr')
         # self.assertIn('1: Buy flowers', [row.text for row in rows])
         # self.assertIn('2: Give a gift to Lisi', [row.text for row in rows])
-        self.check_for_row_in_list_table('1: Buy flowers')
-        self.check_for_row_in_list_table('2: Give a gift to Lisi')
+        self.wait_for_row_in_list_table('1: Buy flowers')
+        self.wait_for_row_in_list_table('2: Give a gift to Lisi')
 
         # 张三想知道这个网站是否会记住他的清单
         # 他看到网站为他生成了要给唯一的URL
@@ -73,7 +84,3 @@ class NewVisitorTest(unittest.TestCase):
         # 他访问那个URL，发现待办列表还在
 
         self.fail("Finish the test!")
-
-
-if __name__ == '__main__':
-    unittest.main()
