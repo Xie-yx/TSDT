@@ -6,17 +6,19 @@ import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from django.test import LiveServerTestCase
+from selenium.common.exceptions import WebDriverException
 
 MAX_WAIT = 10
 
 class NewVisitorTest(LiveServerTestCase):
     def setUp(self):
         chrome_options = Options()
-        # chrome_options.add_argument("--no-sandbox")          # 禁用沙箱
-        # chrome_options.add_argument("--disable-dev-shm-usage")  # 避免共享内存问题
-        chrome_options.add_argument("--headless=new")        # 无头模式（可选）
+        chrome_options.add_argument("--headless")   
+        chrome_options.add_argument("--no-sandbox")
+        # chrome_options.add_argument("--disable-dev-shm-usage")  
         self.browser = webdriver.Chrome(options=chrome_options)
 
+     
     def tearDown(self):
         self.browser.quit()
 
@@ -101,7 +103,13 @@ class NewVisitorTest(LiveServerTestCase):
         # 使用一个心得浏览器会话
         # 确保张三的信息不会从cookie泄露
         self.browser.quit()
-        self.browser = webdriver.Chrome()
+        
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--incognito")  # 添加无痕模式
+        self.browser = webdriver.Chrome(options=chrome_options)
 
         # 王五访问首页
         # 页面中看不到张三的清单
