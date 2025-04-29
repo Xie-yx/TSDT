@@ -127,7 +127,7 @@ class NewVisitorTest(LiveServerTestCase):
 
         # 王五获得了他的唯一URL
         wangwu_list_url = self.browser.current_url
-        self.assertRegex(wangwu_list_url, '/list/.+')
+        self.assertRegex(wangwu_list_url, '/lists/.+')
         self.assertNotEqual(wangwu_list_url, zhangsan_list_url)        
 
         # 这个页面还是没有张三的清单
