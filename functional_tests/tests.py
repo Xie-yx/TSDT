@@ -8,6 +8,7 @@ from selenium.webdriver.common.keys import Keys
 from django.test import LiveServerTestCase
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium.common.exceptions import WebDriverException
+import os
 
 MAX_WAIT = 10
 
@@ -18,8 +19,10 @@ class NewVisitorTest(StaticLiveServerTestCase):
         chrome_options.add_argument("--no-sandbox")
         # chrome_options.add_argument("--disable-dev-shm-usage")  
         self.browser = webdriver.Chrome(options=chrome_options)
+        real_server = os.environ.get('REAL_SERVER')
+        if real_server:
+            self.live_server_url = 'http://' + real_server
 
-     
     def tearDown(self):
         self.browser.quit()
 
