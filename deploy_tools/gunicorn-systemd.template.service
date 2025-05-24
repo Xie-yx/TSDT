@@ -1,0 +1,13 @@
+[unit]
+Description=Gunicorn server for 39.98.59.56
+
+[Service]
+Restart=on-failure
+User=xyx
+WorkingDirectory=/home/xyx/sites/39.98.59.56/source
+ExecStart=/home/xyx/.conda/envs/TDD/bin/gunicorn --bind unix:/tmp/39.98.59.56.socket notes.wsgi:application
+Environment="PATH=/home/xyx/.conda/envs/TDD/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin"
+Environment="PYTHONUNBUFFERED=1"
+
+[Install]
+WantedBy=multi-user.target
