@@ -1,11 +1,39 @@
+# from selenium import webdriver
+
+# browser = webdriver.Chrome()
+
+# #张三听说有一个在线待办事项的应用
+# #他去看了这个应用的首页
+# browser.get('http://localhost:8000')
+
+# #他注意到网页里包含“To-Do”这个词
+# assert 'To-Do' in browser.title,"Browser title was " + browser.title
+
+# #应用有一个输入待办事项的文本输入框
+
+# #他在文本输入框中输入了“Buy flowers”
+
+# #他按了回车键键后，页面更新了
+# #代办事项表格中显示了“1：Buy flowers”
+
+# #页面中又显示了一个文本输入框，可以输入其他待办事项
+# #他输入了“Send a gift to List”
+
+# #页面再次更新，他的清单中显示了这两个代办事项
+
+# #张三想知道这个网站是否会记住他的清单
+# #他看到网站为他生成了一个唯一的URL
+
+# #他访问了那个URL，发现他的代办事项列表还在
+# #他满意的离开了
+
+# browser.quit()
+
+
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-import unittest
-import tempfile
+from selenium.webdriver.common.keys import Keys
 import time
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from django.test import LiveServerTestCase
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium.common.exceptions import WebDriverException
 import os
@@ -13,38 +41,29 @@ import os
 MAX_WAIT = 10
 
 class NewVisitorTest(StaticLiveServerTestCase):
+    
     def setUp(self):
-        chrome_options = Options()
-        chrome_options.add_argument("--headless")   
-        chrome_options.add_argument("--no-sandbox")
-        # chrome_options.add_argument("--disable-dev-shm-usage")  
-        self.browser = webdriver.Chrome(options=chrome_options)
+        self.browser = webdriver.Chrome()
         real_server = os.environ.get('REAL_SERVER')
         if real_server:
             self.live_server_url = 'http://' + real_server
-            
-        # self.browser = webdriver.Chrome()
-        # real_server = os.environ.get('REAL_SERVER')
-        # if real_server:
-        #     self.live_server_url = 'http://' + real_server
-
+        
     def tearDown(self):
         self.browser.quit()
-
-    def wait_for_row_in_list_table(self, row_text):
+        
+    def wait_for_row_in_list_table(self,row_text):
         start_time = time.time()
         while True:
             try:
                 table = self.browser.find_element(By.ID,'id_list_table')
                 rows = table.find_elements(By.TAG_NAME,'tr')
-                self.assertIn(row_text, [row.text for row in rows])
-                return
-            except (AssertionError, WebDriverException) as e:
+                self.assertIn(row_text,[row.text for row in rows])
+                return 
+            except(AssertionError,WebDriverException) as e:
                 if time.time() - start_time > MAX_WAIT:
                     raise e
                 time.sleep(0.5)
-
-
+                
     def test_multiple_users_can_start_lists_at_different_urls(self):
         # 张三创建了一个待办事项清单
         self.browser.get(self.live_server_url)
@@ -61,17 +80,13 @@ class NewVisitorTest(StaticLiveServerTestCase):
         # 使用一个心得浏览器会话
         # 确保张三的信息不会从cookie泄露
         self.browser.quit()
-        time.sleep(1)
-        # self.browser = webdriver.Chrome()
         
         chrome_options = Options()
-        chrome_options.add_argument("--headless")   
+        chrome_options.add_argument("--headless")
         chrome_options.add_argument("--no-sandbox")
-        # chrome_options.add_argument("--disable-dev-shm-usage")  
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--incognito")  # 添加无痕模式
         self.browser = webdriver.Chrome(options=chrome_options)
-        
-        # if self.real_server:
-        #     self.live_server_url = 'http://' + self.real_server
 
         # 王五访问首页
         # 页面中看不到张三的清单
@@ -81,7 +96,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
         self.assertNotIn('Give a gift to Lisi', page_text)
 
         # 王五输入了一个新待办事项，新建一个清单
-        inputbox = self.browser.find_element(By.ID, 'id_new_item')
+        inputbox = self.browser.find_element(By.ID, "id_new_item")
         inputbox.send_keys('Buy milk')
         inputbox.send_keys(Keys.ENTER)
         self.wait_for_row_in_list_table('1: Buy milk')
@@ -99,8 +114,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
 
         # 两人都很满意
 
-
-
+                        
     def test_can_start_a_list_and_retrieve_it_later(self):
         
         # #张三听说有一个在线待办事项的应用
@@ -140,7 +154,10 @@ class NewVisitorTest(StaticLiveServerTestCase):
 
 
         #他满意的离开了。
-        
+            
+    
+    
+    
     def test_layout_and_styling(self):
         #张三访问首页
         self.browser.get(self.live_server_url)
@@ -164,8 +181,3 @@ class NewVisitorTest(StaticLiveServerTestCase):
             512,
             delta=10
             )
-        pass
-
-
-
-
